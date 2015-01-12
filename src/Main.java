@@ -49,7 +49,8 @@ public class Main extends PApplet {
 	public Tile first = null;
 	public void mousePressed()
 	{
-		Tile next = grid.getTile(mouseX/width*grid.rows, mouseY/height*grid.cols);
+		Tile next = grid.getTile((int)(mouseX/(float)width*(float)grid.rows), (int)(mouseY/(float)height*(float)grid.cols));
+		println(next.r + " " + next.c);
 		if (first == null)
 		{
 			first = next;
@@ -57,6 +58,8 @@ public class Main extends PApplet {
 		else
 		{
 			pathTo = path.findAdjustedPath(first.r, first.c, next.r, next.c);
+			if (pathTo != null)
+				println(pathTo.size());
 			first = null;
 		}
 	}
