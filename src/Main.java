@@ -32,6 +32,12 @@ public class Main extends PApplet {
 					fill(255);
 				int len = width/grid.rows;
 				rect(r*len, c*len, len, len);
+				Color f = status[r][c]; //f for fill
+				if (f != null)
+				{
+					fill(f.r, f.g, f.b);
+					rect(r*len + len/4, c*len + len/4, len/2, len/2);
+				}
 			}
 		}
 		fill(255,0,0);
@@ -50,15 +56,16 @@ public class Main extends PApplet {
 	{
 		if (mouseButton == LEFT)
 		{
-			next = grid.getTile((int)(mouseX/(float)width*(float)grid.rows), (int)(mouseY/(float)height*(float)grid.cols));
+			Tile candidate = grid.getTile((int)(mouseX/(float)width*(float)grid.rows), (int)(mouseY/(float)height*(float)grid.cols));
 			//println(next.r + " " + next.c);
 			if (first == null)
 			{
-				first = next;
+				first = candidate;
 				pathTo = null;
 			}
 			else if (next == null)
 			{
+				next = candidate;
 				path.findPath(first.r, first.c, next.r, next.c, true);
 			}
 			else

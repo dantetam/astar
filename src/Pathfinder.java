@@ -48,6 +48,8 @@ public class Pathfinder {
 		openSet = new ArrayList<Node>();
 		closedSet = new ArrayList<Node>();
 
+		System.out.println(openSet + ":::" + closedSet);
+		
 		openSet.add(start);
 
 		lastNode = start;
@@ -79,6 +81,7 @@ public class Pathfinder {
 	private boolean iterate()
 	{
 		//System.out.println("ran");
+		System.out.println(openSet + " " + closedSet);
 		Node current = openSet.get(findLowestQueueIndex(openSet));
 		openSet.remove(findLowestQueueIndex(openSet));
 		closedSet.add(current);
