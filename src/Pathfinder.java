@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 
 public class Pathfinder {
@@ -16,14 +17,17 @@ public class Pathfinder {
 		{
 			for (int c = 0; c < grid.cols; c++)
 			{
-				//if (grid.getTile(r,c).biome != -1)
+				if (grid.getTile(r,c).biome != -1)
 					nodes[r][c] = new Node(r,c);
 			}
 		}
 		//System.out.println(x1 + "," + y1 + "," + x2 + "," + y2);
 	}
 	
-	public ArrayList<Tile> findPath(int x1, int y1, int x2, int y2, boolean diagonal)
+	//http://theory.stanford.edu/~amitp/GameProgramming/\
+	//public ArrayList<Tile> findPath(Civilization civ, int x1, int y1, int x2, int y2, boolean diagonal)
+	Node lastNode;
+	public void findPath(int x1, int y1, int x2, int y2, boolean diagonal)
 	{
 		for (int r = 0; r < grid.rows; r++)
 		{
@@ -46,69 +50,72 @@ public class Pathfinder {
 
 		openSet.add(start);
 
-		Node lastNode = start;
-		do
+		lastNode = start;
+	}
+	
+	//Simulates one step of the iteration process and has 3 possibilities
+	//null -> no path
+	//empty -> still pathing
+	//non-empty -> path
+	//Intended to be used by a visual output program
+	public ArrayList<Tile> iterateAndReturn()
+	{
+		if (!iterate()) 
+			return null;
+		if (!openSet.get(findLowestQueueIndex(openSet)).equals(end))
 		{
-			//System.out.println("ran");
-			Node current = openSet.get(findLowestQueueIndex(openSet));
-			openSet.remove(findLowestQueueIndex(openSet));
-			closedSet.add(current);
-			ArrayList<Node> ns = findValidNeighbors(current,diagonal);
-			for (int i = 0; i < ns.size(); i++)
+			ArrayList<Tile> temp = new ArrayList<Tile>();
+			do
 			{
-				double cost;
-				if (diagonal)
-					cost = current.g + current.dist(ns.get(i));
-				else
-					cost = current.g + 1;
-				/*if (current.r != ns.get(i).r && current.c != ns.get(i).c)
-					cost = current.g + 1.4;
-				else
-					cost = current.g + 1;*/
-				if (openSet.contains(ns.get(i)) && cost < ns.get(i).g)
-				{
-					removeNodeFromOpen(ns.get(i));
-					//closedSet.add(ns.get(i));
-				}
-				if (closedSet.contains(ns.get(i)) && cost < ns.get(i).g)
-				{
-					removeNodeFromClosed(ns.get(i));
-				}
-				if (!openSet.contains(ns.get(i)) && !closedSet.contains(ns.get(i)))
-				{
-					ns.get(i).g = cost;
-					openSet.add(ns.get(i));
-					double dist = ns.get(i).dist(end);
-					if (dist == -1)
-					{
-						//System.err.println("No path found.");
-						return null;
-					}
-					ns.get(i).queue = ns.get(i).g + 1.1*dist;
-					ns.get(i).parent = current;
-					lastNode = ns.get(i);
-				}
-			}
-			for (int i = openSet.size() - 1; i >= 0; i--)
-			{
-				if (openSet.get(i).dist(end) > 1.25*start.dist(end))
-				{
-					openSet.remove(i);
-				}
-			}
-			if (openSet.size() == 0) 
-			{
-				//System.err.println("No path found.");
-				return null;
-			}
-		} while (!openSet.get(findLowestQueueIndex(openSet)).equals(end));
-		ArrayList<Tile> temp = new ArrayList<Tile>();
-		do
+				temp.add(grid.getTile(lastNode.r,lastNode.c));
+				lastNode = lastNode.parent;
+			} while (lastNode.parent != null);
+			return temp;
+		}
+		return new ArrayList<Tile>();
+	}
+	
+	//Simulates one iteration of the actual algorithm itself
+	private boolean iterate()
+	{
+		//System.out.println("ran");
+		Node current = openSet.get(findLowestQueueIndex(openSet));
+		openSet.remove(findLowestQueueIndex(openSet));
+		closedSet.add(current);
+		ArrayList<Node> ns = findValidNeighbors(current,true);
+		for (int i = 0; i < ns.size(); i++)
 		{
-			temp.add(grid.getTile(lastNode.r,lastNode.c));
-			lastNode = lastNode.parent;
-		} while (lastNode.parent != null);
-		return temp;
+			double cost;
+			if (true)
+				cost = current.g + current.dist(ns.get(i));
+			else
+				cost = current.g + 1;
+			/*if (current.r != ns.get(i).r && current.c != ns.get(i).c)
+				cost = current.g + 1.4;
+			else
+				cost = current.g + 1;*/
+			if (openSet.contains(ns.get(i)) && cost < ns.get(i).g)
+				removeNodeFromOpen(ns.get(i));
+			if (closedSet.contains(ns.get(i)) && cost < ns.get(i).g)
+				removeNodeFromClosed(ns.get(i));
+			if (!openSet.contains(ns.get(i)) && !closedSet.contains(ns.get(i)))
+			{
+				ns.get(i).g = cost;
+				openSet.add(ns.get(i));
+				double dist = ns.get(i).dist(end);
+				if (dist == -1)
+					return false;
+				ns.get(i).queue = ns.get(i).g + 1.1*dist;
+				ns.get(i).parent = current;
+				lastNode = ns.get(i);
+			}
+		}
+		for (int i = openSet.size() - 1; i >= 0; i--)
+			if (openSet.get(i).dist(end) > 1.25*start.dist(end))
+				openSet.remove(i);
+		if (openSet.size() == 0) 
+			return false;
+		return true;
 	}
 	
 	//http://theory.stanford.edu/~amitp/GameProgramming/\
@@ -135,9 +142,7 @@ public class Pathfinder {
 		end = nodes[x2][y2];
 		openSet = new ArrayList<Node>();
 		closedSet = new ArrayList<Node>();
-
 		openSet.add(start);
-
 		int stop;
 		do
 		{
@@ -212,7 +217,7 @@ public class Pathfinder {
 	}*/
 	
 	//public ArrayList<Tile> findAdjustedPath(Civilization civ, int x1, int y1, int x2, int y2)
-	public ArrayList<Tile> findAdjustedPath(int x1, int y1, int x2, int y2)
+	/*public ArrayList<Tile> findAdjustedPath(int x1, int y1, int x2, int y2)
 	{
 		ArrayList<Tile> temp = findPath(x1,y1,x2,y2,true);
 		//ArrayList<Tile> temp = findPath(civ,x1,y1,x2,y2,true);
@@ -224,7 +229,7 @@ public class Pathfinder {
 		}
 		//temp.add(temp.size(),new Location(start.r,start.c));
 		return temp;
-	}
+	}*/
 
 	public int findLowestQueueIndex(ArrayList<Node> nodes)
 	{
@@ -338,6 +343,7 @@ public class Pathfinder {
 				//return Math.abs((double)other.r - r) + Math.abs((double)other.c - c);
 			return -1;
 		}
+		public int[] array() {return new int[]{r,c};}
 	}
 
 	public class Location {int r, c; public Location(int x, int y) {r=x; c=y;}}

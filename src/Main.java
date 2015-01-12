@@ -8,12 +8,14 @@ public class Main extends PApplet {
 	public Grid grid;
 	public Pathfinder path;
 	public ArrayList<Tile> pathTo = new ArrayList<Tile>();
+	public int rows = 20, cols = 20;
 
 	public void setup()
 	{
 		size(800,800);
 		grid = new Grid(20,20);
 		path = new Pathfinder(grid);
+		status = new Color[rows][cols];
 	}
 
 	public void draw()
@@ -25,13 +27,9 @@ public class Main extends PApplet {
 			{
 				Tile t = grid.getTile(r, c);
 				if (t.biome == -1)
-				{
 					fill(150,225,255);
-				}
 				else
-				{
 					fill(255);
-				}
 				int len = width/grid.rows;
 				rect(r*len, c*len, len, len);
 			}
@@ -46,22 +44,54 @@ public class Main extends PApplet {
 			}
 	}
 
-	public Tile first = null;
+	public Tile first = null, next = null;
+	public Color[][] status;
 	public void mousePressed()
 	{
-		Tile next = grid.getTile((int)(mouseX/(float)width*(float)grid.rows), (int)(mouseY/(float)height*(float)grid.cols));
-		println(next.r + " " + next.c);
-		if (first == null)
+		if (mouseButton == LEFT)
 		{
-			first = next;
+			next = grid.getTile((int)(mouseX/(float)width*(float)grid.rows), (int)(mouseY/(float)height*(float)grid.cols));
+			//println(next.r + " " + next.c);
+			if (first == null)
+			{
+				first = next;
+				pathTo = null;
+			}
+			else if (next == null)
+			{
+				path.findPath(first.r, first.c, next.r, next.c, true);
+			}
+			else
+			{
+				
+			}
 		}
 		else
 		{
-			pathTo = path.findAdjustedPath(first.r, first.c, next.r, next.c);
-			if (pathTo != null)
-				println(pathTo.size());
-			first = null;
+			ArrayList<Tile> result = path.iterateAndReturn();
+			if (result == null)
+			{
+				println("No path");
+				first = null; next = null;
+			}
+			else if (result.size() != 0)
+			{
+				pathTo = result;
+			}
+			status = new Color[rows][cols];
+			for (int i = 0; i < path.openSet.size(); i++)
+			{
+				int[] t = path.openSet.get(i).array();
+				status[t[0]][t[1]] = new Color(0,255,0);
+			}
+			for (int i = 0; i < path.closedSet.size(); i++)
+			{
+				int[] t = path.openSet.get(i).array();
+				status[t[0]][t[1]] = new Color(255,0,0);
+			}
 		}
 	}
 
+	public class Color {float r, g, b; public Color(float x, float y, float z) {r = x; g = y; b = z;} }
+	
 }
