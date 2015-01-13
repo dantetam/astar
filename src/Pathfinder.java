@@ -68,7 +68,7 @@ public class Pathfinder {
 		if (candidate.equals(end))
 		{
 			ArrayList<Tile> temp = recursivePath();
-			temp.add(grid.getTile(candidate.r, candidate.c));
+			//temp.add(grid.getTile(candidate.r, candidate.c));
 			return temp;
 		}
 		else
@@ -132,7 +132,7 @@ public class Pathfinder {
 		return true;
 	}
 	
-	private ArrayList<Tile> recursivePath()
+	public ArrayList<Tile> recursivePath()
 	{
 		ArrayList<Tile> temp = new ArrayList<Tile>();
 		do

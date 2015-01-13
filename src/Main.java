@@ -88,6 +88,7 @@ public class Main extends PApplet {
 				if (pathTo.contains(next))
 				{
 					first = null; next = null;
+					path.openSet.clear(); path.closedSet.clear();
 				}
 			}
 			status = new Color[rows][cols];
@@ -101,6 +102,10 @@ public class Main extends PApplet {
 				int[] t = path.openSet.get(i).array();
 				status[t[0]][t[1]] = new Color(255,0,0);
 			}
+			ArrayList<Tile> t = path.recursivePath();
+			if (t != null)
+				for (int i = 0; i < t.size(); i++)
+					status[t.get(i).r][t.get(i).c] = new Color(150,225,255);
 		}
 	}
 
