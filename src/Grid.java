@@ -4,7 +4,7 @@ public class Grid {
 	private Tile[][] tiles;
 	public int rows, cols;
 	
-	public Grid(int nr, int nc)
+	public Grid(int nr, int nc, double p)
 	{
 		rows = nr; 
 		cols = nc;
@@ -14,7 +14,7 @@ public class Grid {
 			for (int c = 0; c < cols; c++)
 			{
 				tiles[r][c] = new Tile(r,c);
-				if (Math.random() < 0.75)
+				if (Math.random() < p)
 					tiles[r][c].biome = 0;
 				else
 					tiles[r][c].biome = -1;

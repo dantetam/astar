@@ -13,7 +13,7 @@ public class Main extends PApplet {
 	public void setup()
 	{
 		size(800,800);
-		grid = new Grid(20,20);
+		grid = new Grid(rows, cols, 0.75);
 		path = new Pathfinder(grid);
 		status = new Color[rows][cols];
 	}
@@ -99,7 +99,7 @@ public class Main extends PApplet {
 			}
 			for (int i = 0; i < path.closedSet.size(); i++)
 			{
-				int[] t = path.openSet.get(i).array();
+				int[] t = path.closedSet.get(i).array();
 				status[t[0]][t[1]] = new Color(255,0,0);
 			}
 			ArrayList<Tile> t = path.recursivePath();
