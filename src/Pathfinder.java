@@ -48,7 +48,7 @@ public class Pathfinder {
 		openSet = new ArrayList<Node>();
 		closedSet = new ArrayList<Node>();
 
-		System.out.println(openSet + ":::" + closedSet);
+		//System.out.println(openSet + ":::" + closedSet);
 		
 		openSet.add(start);
 
@@ -64,15 +64,26 @@ public class Pathfinder {
 	{
 		if (!iterate()) 
 			return null;
-		if (!openSet.get(findLowestQueueIndex(openSet)).equals(end))
+		Node candidate = openSet.get(findLowestQueueIndex(openSet)); 
+		if (candidate.equals(end))
 		{
-			ArrayList<Tile> temp = new ArrayList<Tile>();
-			do
-			{
-				temp.add(grid.getTile(lastNode.r,lastNode.c));
-				lastNode = lastNode.parent;
-			} while (lastNode.parent != null);
+			ArrayList<Tile> temp = recursivePath();
+			temp.add(grid.getTile(candidate.r, candidate.c));
 			return temp;
+		}
+		else
+		{
+			//Shortcut checking
+			ArrayList<Node> n = findValidNeighbors(candidate, true);
+			for (int i = 0; i < n.size(); i++)
+			{
+				if (n.get(i).equals(end))
+				{
+					ArrayList<Tile> temp = recursivePath();
+					temp.add(grid.getTile(n.get(i).r, n.get(i).c));
+					return temp;
+				}
+			}
 		}
 		return new ArrayList<Tile>();
 	}
@@ -119,6 +130,18 @@ public class Pathfinder {
 		if (openSet.size() == 0) 
 			return false;
 		return true;
+	}
+	
+	private ArrayList<Tile> recursivePath()
+	{
+		ArrayList<Tile> temp = new ArrayList<Tile>();
+		do
+		{
+			temp.add(grid.getTile(lastNode.r,lastNode.c));
+			lastNode = lastNode.parent;
+			if (lastNode == null) return null;
+		} while (lastNode.parent != null);
+		return temp;
 	}
 	
 	//http://theory.stanford.edu/~amitp/GameProgramming/\

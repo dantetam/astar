@@ -75,6 +75,7 @@ public class Main extends PApplet {
 		}
 		else
 		{
+			if (first == null || next == null) return;
 			ArrayList<Tile> result = path.iterateAndReturn();
 			if (result == null)
 			{
@@ -84,6 +85,10 @@ public class Main extends PApplet {
 			else if (result.size() != 0)
 			{
 				pathTo = result;
+				if (pathTo.contains(next))
+				{
+					first = null; next = null;
+				}
 			}
 			status = new Color[rows][cols];
 			for (int i = 0; i < path.openSet.size(); i++)
